@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Campus Copilot — Intelligent University Navigation & Location Finder</title>
+  <meta name="description" content="AI-powered Campus Copilot to find, address, and navigate to any classroom, laboratory, seminar hall, cafeteria, or administrative office across the university campus with turn-by-turn indoor and outdoor routing.">
+  <meta name="theme-color" content="#0a0e17">
+
+  <!-- Open Graph / Meta -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Campus Copilot — University Navigation & Location AI">
+  <meta property="og:description" content="Find any classroom, lab, seminar hall, or faculty office instantly with AI assistance and interactive vector floor plans.">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ========================================================================
+       TOP NAVIGATION BAR
+       ======================================================================== -->
+  <header class="app-header" role="banner">
+    <!-- Brand / Logo -->
+    <div class="header-brand" id="header-brand" title="Reset to Campus Overview">
+      <div class="brand-icon" aria-hidden="true">🏛️</div>
+      <div class="brand-info">
+        <h1>
+          CAMPUS COPILOT
+          <span class="status-badge" id="ai-status-indicator">AI Online</span>
+        </h1>
+        <p>Apex Institute of Science & Technology • Live Directory</p>
+      </div>
+    </div>
+
+    <!-- Universal Search Bar -->
+    <div class="header-search">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input 
+          type="text" 
+          id="global-search-input" 
+          class="search-input" 
+          placeholder="Search any room, lab, seminar hall, faculty (e.g. AI Lab, A-201, Kalam Hall)..."
+          autocomplete="off"
+          aria-label="Search campus locations"
+        >
+        <div class="search-actions">
+          <button id="search-mic-btn" class="search-mic-btn" title="Speak location to search" aria-label="Voice search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+          </button>
+          <span class="kbd-shortcut" title="Keyboard Shortcut">Ctrl K</span>
+        </div>
+      </div>
+
+      <!-- Autocomplete Dropdown List -->
+      <div class="search-dropdown" id="search-dropdown" role="listbox"></div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <!-- Voice Toggle -->
+      <button class="header-icon-btn" id="btn-toggle-voice" title="Toggle AI Voice Announcements" aria-label="Toggle AI Voice">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+      </button>
+
+      <!-- Theme Switcher -->
+      <button class="header-icon-btn" id="btn-toggle-theme" title="Switch Light/Dark Mode" aria-label="Toggle Theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+
+      <!-- Quick Route CTA -->
+      <button class="header-action-btn" onclick="document.querySelector('[data-tab=\'route\']').click()" aria-label="Open Directions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+        </svg>
+        <span>Get Directions</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       CATEGORY FILTER BAR
+       ======================================================================== -->
+  <nav class="category-filter-bar" aria-label="Filter locations by category">
+    <button class="filter-chip active" data-category="all">
+      <span>🌐</span> All Campus
+    </button>
+    <button class="filter-chip" data-category="lab">
+      <span>🔬</span> Laboratories & Research
+    </button>
+    <button class="filter-chip" data-category="seminar">
+      <span>🎭</span> Seminar Halls & Auditoriums
+    </button>
+    <button class="filter-chip" data-category="classroom">
+      <span>📚</span> Classrooms & Lecture Halls
+    </button>
+    <button class="filter-chip" data-category="library">
+      <span>📖</span> Library & Study Zones
+    </button>
+    <button class="filter-chip" data-category="food">
+      <span>☕</span> Food Court & Cafeteria
+    </button>
+    <button class="filter-chip" data-category="admin">
+      <span>💼</span> Administration & Offices
+    </button>
+    <button class="filter-chip" data-category="sports">
+      <span>🏸</span> Gym & Sports Complex
+    </button>
+    <button class="filter-chip" data-category="amenity">
+      <span>🏥</span> Health & Amenities
+    </button>
+  </nav>
+
+  <!-- ========================================================================
+       MAIN APP BODY (MAP VIEWPORT + COPILOT SIDEBAR)
+       ======================================================================== -->
+  <main class="app-body">
+    <!-- Interactive Map Viewport -->
+    <section class="map-container" id="map-container" aria-label="Interactive Campus Vector Map">
+      <!-- CampusMapEngine will mount here -->
+    </section>
+
+    <!-- Sidebar: AI Copilot Assistant & Directory Tabs -->
+    <aside class="copilot-sidebar" id="copilot-sidebar" role="complementary" aria-label="Campus Copilot Assistant">
+      <!-- Tabs Navigation -->
+      <div class="sidebar-tabs" role="tablist">
+        <button class="tab-btn active" data-tab="chat" role="tab" aria-selected="true" id="tab-btn-chat">
+          <span>🤖</span> Copilot AI
+        </button>
+        <button class="tab-btn" data-tab="directory" role="tab" aria-selected="false" id="tab-btn-directory">
+          <span>📍</span> Directory
+        </button>
+        <button class="tab-btn" data-tab="route" role="tab" aria-selected="false" id="tab-btn-route">
+          <span>🧭</span> Routes
+        </button>
+        <button class="tab-btn" data-tab="events" role="tab" aria-selected="false" id="tab-btn-events">
+          <span>📅</span> Live Events
+        </button>
+      </div>
+
+      <!-- TAB 1: COPILOT AI CHAT STREAM -->
+      <div class="tab-content active" id="tab-chat" role="tabpanel" aria-labelledby="tab-btn-chat">
+        <div class="chat-container">
+          <!-- Chat Message History -->
+          <div class="chat-messages" id="chat-messages" role="log" aria-live="polite"></div>
+
+          <!-- Suggested Quick Prompts -->
+          <div class="chat-quick-suggestions" aria-label="Suggested questions">
+            <button class="chip-suggestion">⏰ Lecture Timings (A-002)</button>
+            <button class="chip-suggestion">🔬 AI Lab Schedule</button>
+            <button class="chip-suggestion">🎯 Find AI Lab (A-201)</button>
+            <button class="chip-suggestion">🚶 Route to Kalam Auditorium</button>
+            <button class="chip-suggestion">☕ Nearest Cafeteria</button>
+            <button class="chip-suggestion">🤫 Quiet Reading Hall</button>
+            <button class="chip-suggestion">♿ Wheelchair Route to Library</button>
+            <button class="chip-suggestion">📅 Today's Live Events</button>
+          </div>
+
+          <!-- Chat Input Bar -->
+          <div class="chat-input-bar">
+            <button id="chat-mic-btn" class="chat-mic-btn" title="Speak to Copilot" aria-label="Speech to text">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+            </button>
+            <input 
+              type="text" 
+              id="chat-input" 
+              class="chat-input" 
+              placeholder="Ask Copilot: 'Where is Physics Lab?', 'Directions from Gate 1'..." 
+              autocomplete="off"
+            >
+            <button id="chat-send-btn" class="chat-send-btn" title="Send message" aria-label="Send message">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: DIRECTORY OF ALL ROOMS & LABS -->
+      <div class="tab-content" id="tab-directory" role="tabpanel" aria-labelledby="tab-btn-directory">
+        <div class="directory-container">
+          <div class="directory-header">
+            <h3>Campus Location Directory</h3>
+            <span class="directory-count" id="directory-count-badge">48 Locations</span>
+          </div>
+          <div id="directory-list"></div>
+        </div>
+      </div>
+
+      <!-- TAB 3: STEP-BY-STEP ROUTE FINDER -->
+      <div class="tab-content" id="tab-route" role="tabpanel" aria-labelledby="tab-btn-route">
+        <div class="route-planner-container">
+          <div class="route-form">
+            <div class="route-input-group">
+              <label for="route-start-select">Starting Location</label>
+              <select id="route-start-select" class="route-select"></select>
+            </div>
+            <div class="route-input-group">
+              <label for="route-end-select">Destination (Room / Lab / Hall)</label>
+              <select id="route-end-select" class="route-select"></select>
+            </div>
+            <div class="route-toggle-row">
+              <label>
+                <input type="checkbox" id="route-accessible-toggle">
+                <span>♿ Wheelchair Accessible (Elevators & Ramps only)</span>
+              </label>
+            </div>
+            <button class="btn-compute-route" id="btn-calculate-route">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+              </svg>
+              <span>Calculate Turn-by-Turn Route</span>
+            </button>
+          </div>
+
+          <div class="route-directions-list" id="route-directions-list">
+            <div style="text-align: center; color: var(--text-dim); padding: 24px; font-size: 0.85rem;">
+              Select starting spot and destination above, then click <strong>Calculate Route</strong> to view illuminated step-by-step instructions.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: LIVE EVENTS & SCHEDULE -->
+      <div class="tab-content" id="tab-events" role="tabpanel" aria-labelledby="tab-btn-events">
+        <div class="events-container">
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main);">Today's Campus Symposiums & Events</h3>
+          <div id="events-list"></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ========================================================================
+       LOCATION DETAILS MODAL / DRAWER
+       ======================================================================== -->
+  <div class="location-modal-overlay" id="location-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-room-title">
+    <div class="location-modal">
+      <!-- Modal Header Banner -->
+      <div class="modal-header-banner">
+        <button class="modal-close-btn" id="modal-close-btn" aria-label="Close details modal">✕</button>
+        <div class="modal-pills">
+          <span class="modal-pill" id="modal-code-pill">A-201</span>
+          <span class="modal-pill" id="modal-cat-pill">LAB</span>
+        </div>
+        <h2 class="modal-title" id="modal-room-title">Artificial Intelligence & Deep Learning Lab</h2>
+        <div class="modal-address" id="modal-room-address">
+          Turing Hall (Block A) • Floor 2 • Room A-201
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <!-- Description -->
+        <div>
+          <div class="modal-section-title">Overview & Purpose</div>
+          <p class="modal-description" id="modal-room-desc"></p>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="modal-info-grid">
+          <div class="info-grid-card">
+            <div class="info-grid-label">CURRENT STATUS</div>
+            <div class="info-grid-value" id="modal-val-status">Available</div>
+          </div>
+          <div class="info-grid-card">
+            <div class="info-grid-label">MAX CAPACITY</div>
+            <div class="info-grid-value" id="modal-val-capacity">55 Occupants</div>
+          </div>
+          <div class="info-grid-card">
+            <div class="info-grid-label">FACULTY IN-CHARGE</div>
+            <div class="info-grid-value" id="modal-val-incharge">Dr. Sarah Mitchell</div>
+          </div>
+          <div class="info-grid-card">
+            <div class="info-grid-label">OPERATING HOURS</div>
+            <div class="info-grid-value" id="modal-val-hours">08:00 AM - 09:30 PM</div>
+          </div>
+        <!-- Lecture Timetable & Schedule -->
+        <div id="modal-timetable-container">
+          <div class="modal-section-title">⏰ Today's Lecture Timings & Daily Timetable</div>
+          <div class="lecture-timetable-list" id="modal-timetable-list"></div>
+        </div>
+
+        <!-- Equipment & Facilities -->
+        <div>
+          <div class="modal-section-title">Available Equipment & Infrastructure</div>
+          <div class="equipment-chips-list" id="modal-equipment-chips"></div>
+        </div>
+
+        <!-- Walking Directions Hint -->
+        <div>
+          <div class="modal-section-title">How to Reach from Lobby</div>
+          <div class="directions-hint-box" id="modal-directions-hint"></div>
+        </div>
+      </div>
+
+      <!-- Modal Footer Action Buttons -->
+      <div class="modal-footer-actions">
+        <button class="modal-btn-primary" id="modal-btn-directions">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+          </svg>
+          <span>Get Directions Here</span>
+        </button>
+        <button class="modal-btn-secondary" id="modal-btn-speak" title="Listen to Voice Directions">
+          <span>🔊</span> Listen
+        </button>
+        <button class="modal-btn-secondary" id="modal-btn-share" title="Copy Location Link">
+          <span>🔗</span> Share
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="campus-toast" id="campus-toast" role="alert" aria-live="assertive"></div>
+
+  <!-- Application Scripts -->
+  <script src="data/campus-data.js"></script>
+  <script src="js/pathfinder.js"></script>
+  <script src="js/copilot.js"></script>
+  <script src="js/map-engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
